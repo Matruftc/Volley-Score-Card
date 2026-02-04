@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Volley Ball Score Card - Pro Edition</title>
+
+<style>
+/* Background and Layout */
+.bg-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: filter 0.8s ease; }
+.overlay { position: fixed; inset: 0; background: linear-gradient(rgba(15,23,42,0.85), rgba(2,6,23,0.95)); z-index: -1; transition: background 0.8s ease; }
+
+/* 🌙 TENSION ATMOSPHERE */
+.tension-active .overlay {
+    background: linear-gradient(rgba(153, 27, 27, 0.8), rgba(69, 10, 10, 0.9));
+    animation: pulse-tension 2s infinite ease-in-out;
+}
+.tension-active .bg-video { filter: saturate(1.8) blur(2px); }
+.tension-active .footer-tag span { animation: glow-text 2s infinite; }
+
+@keyframes pulse-tension {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes glow-text {
+    0%, 100% { text-shadow: 0 0 5px #22c55e; color: #22c55e; }
+    50% { text-shadow: 0 0 20px #22c55e, 0 0 30px #22c55e; color: #fff; }
+}
+
+body { margin: 0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; overflow-x: hidden;}
+
+.app { width: 90%; max-width: 450px; background: rgba(2,6,23,0.85); backdrop-filter: blur(14px); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); position: relative;}
+
+/* Footer Branding */
+.footer-tag { position: fixed; bottom: 15px; right: 20px; font-size: 10px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; text-transform: uppercase; z-index: 100; pointer-events: none; }
+.footer-tag span { color: #22c55e; font-weight: bold; transition: all 0.5s ease; }
+
+h1 { text-align: center; margin-bottom: 15px; font-weight: 300; letter-spacing: 1px; font-size: 22px; }
+.setup, .scoreboard { display: none; }
+.active { display: block; }
+
+/* Setup Cards */
+.format-selector { display: flex; gap: 10px; margin: 15px 0 25px 0; }
+.format-card { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s; }
+.format-card.selected { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3); }
+.format-card .sets-num { display: block; font-size: 24px; font-weight: 800; }
+.format-card .sets-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
+
+/* Rotation Grid */
+.rotation-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 10px auto; width: 120px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 8px; }
+.pos { width: 30px; height: 30px; background: #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.3s; }
+.pos.server { background: #fbbf24; color: #000; font-weight: bold; box-shadow: 0 0 10px #fbbf24; }
+
+/* Scoreboard Elements */
+.teams { display: flex; gap: 15px; margin-top: 20px; }
+.team { flex: 1; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; text-align: center; }
+.score { font-size: 72px; font-weight: 800; margin: 10px 0; line-height: 1; }
+.meta { margin-top: 20px; text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+
+/* History */
+.history-container { margin-top: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 10px; display: none; }
+.history-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+.winner-cell { color: #22c55e; font-weight: bold; }
+
+/* Inputs & Buttons */
+input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: none; font-size: 16px; box-sizing: border-box; font-family: inherit;}
+input { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
+button { font-weight: bold; cursor: pointer; transition: 0.2s; }
+.primary { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+.undo-btn { background: #475569; margin-top: 8px; font-size: 14px; color: #cbd5e1; }
+.danger { background: #ef4444; color: white; }
+
+#timeoutOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); border-radius: 20px; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+#timerDisplay { font-size: 80px; font-weight: 800; color: #fbbf24; }
+</style>
+</head>
+<body id="bodyTag">
+
+<video class="bg-video" autoplay muted loop playsinline>
+  <source src="https://www.desktophut.com/files/1654697080-1654697080-live-wallpaper-hd-tobio-kageyama-haikyuu.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div class="app">
+    <div id="timeoutOverlay">
+        <h2 style="color:white">TIMEOUT</h2>
+        <div id="timerDisplay">30</div>
+        <button class="danger" style="width: auto; padding: 10px 30px;" onclick="stopTimeout()">End Early</button>
+    </div>
+
+  <h1>🏐 Volley Ball Score Card</h1>
+
+  <div class="setup active" id="setup">
+    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Match Format</label>
+    <div class="format-selector">
+        <div class="format-card" onclick="setFormat(1, this)">
+            <span class="sets-num">1</span>
+            <span class="sets-label">Single</span>
+        </div>
+        <div class="format-card selected" onclick="setFormat(3, this)">
+            <span class="sets-num">3</span>
+            <span class="sets-label">Best of 3</span>
+        </div>
+        <div class="format-card" onclick="setFormat(5, this)">
+            <span class="sets-num">5</span>
+            <span class="sets-label">Best of 5</span>
+        </div>
+    </div>
+    <input type="hidden" id="matchFormatValue" value="3">
+    
+    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Team Names</label>
+    <input type="text" id="teamAName" placeholder="Team A">
+    <input type="text" id="teamBName" placeholder="Team B">
+    
+    <button class="primary" style="margin-top: 25px;" onclick="startMatch()">START MATCH</button>
+  </div>
+
+  <div class="scoreboard" id="scoreboard">
+    <div class="teams" id="teamContainer">
+      <div class="team" id="containerA">
+        <h2 id="nameA" style="font-size:14px; margin:0; opacity: 0.7;">A</h2>
+        <div class="rotation-grid" id="rotA">
+            <div class="pos" id="a-4">4</div><div class="pos" id="a-3">3</div><div class="pos" id="a-2">2</div>
+            <div class="pos" id="a-5">5</div><div class="pos" id="a-6">6</div><div class="pos" id="a-1">1</div>
+        </div>
+        <div class="score" id="scoreA">0</div>
+        <button class="primary" id="btnA" onclick="addPoint('A')">+1</button>
+      </div>
+
+      <div class="team" id="containerB">
+        <h2 id="nameB" style="font-size:14px; margin:0; opacity: 0.7;">B</h2>
+        <div class="rotation-grid" id="rotB">
+            <div class="pos" id="b-2">2</div><div class="pos" id="b-3">3</div><div class="pos" id="b-4">4</div>
+            <div class="pos" id="b-1">1</div><div class="pos" id="b-6">6</div><div class="pos" id="b-5">5</div>
+        </div>
+        <div class="score" id="scoreB">0</div>
+        <button class="primary" id="btnB" onclick="addPoint('B')">+1</button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <button class="undo-btn" onclick="undoPoint()">↩ Undo</button>
+        <button class="undo-btn" onclick="startTimeout()">⏱ Timeout</button>
+    </div>
+    
+    <div class="meta">
+      <strong>SET <span id="currentSetDisplay">1</span></strong><br>
+      Sets: <span id="setsDisplay">0 - 0</span> | <span id="matchTimer">00:00</span>
+    </div>
+
+    <div id="winnerText" style="text-align: center; color: #fbbf24; font-weight: bold; margin: 10px 0;"></div>
+
+    <div class="history-container" id="historyContainer">
+        <table class="history-table">
+            <thead>
+                <tr><th>SET</th><th id="hNameA">A</th><th id="hNameB">B</th></tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </div>
+
+    <button class="undo-btn" style="background: rgba(255,255,255,0.05); margin-top: 15px;" onclick="changeSide()">🔁 Swap Sides</button>
+  </div>
+</div>
+
+<div class="footer-tag">Owned by <span>Matru</span></div>
+
+<script>
+const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+const whistleSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3');
+
+let scoreA = 0, scoreB = 0, setsWonA = 0, setsWonB = 0, currentSet = 1, totalSets = 3;
+let servingTeam = null, lastPoint = null, isMatchOver = false;
+let rotationA = [1, 6, 5, 4, 3, 2], rotationB = [1, 6, 5, 4, 3, 2];
+let matchStartTime, timerInterval, timeoutInt;
+
+function setFormat(val, el) {
+    clickSound.play();
+    document.getElementById("matchFormatValue").value = val;
+    document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function startMatch() {
+    whistleSound.play();
+    const nA = document.getElementById("teamAName").value || "Team A";
+    const nB = document.getElementById("teamBName").value || "Team B";
+    totalSets = parseInt(document.getElementById("matchFormatValue").value);
+    
+    document.getElementById("nameA").textContent = nA;
+    document.getElementById("nameB").textContent = nB;
+    document.getElementById("hNameA").textContent = nA;
+    document.getElementById("hNameB").textContent = nB;
+    
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("scoreboard").style.display = "block";
+    
+    matchStartTime = Date.now();
+    timerInterval = setInterval(updateMatchTimer, 1000);
+    updateRotationUI();
+}
+
+function updateMatchTimer() {
+    let diff = Math.floor((Date.now() - matchStartTime) / 1000);
+    let m = Math.floor(diff / 60).toString().padStart(2, '0');
+    let s = (diff % 60).toString().padStart(2, '0');
+    document.getElementById("matchTimer").textContent = `${m}:${s}`;
+}
+
+function addPoint(team) {
+    if (isMatchOver) return;
+    if (servingTeam && servingTeam !== team) rotate(team);
+    lastPoint = team; servingTeam = team;
+    team === 'A' ? scoreA++ : scoreB++;
+    updateUI();
+    checkSet();
+}
+
+function rotate(team) {
+    if (team === 'A') rotationA.unshift(rotationA.pop());
+    else rotationB.unshift(rotationB.pop());
+    updateRotationUI();
+}
+
+function updateRotationUI() {
+    document.querySelectorAll('.pos').forEach(el => el.classList.remove('server'));
+    if (servingTeam === 'A') document.getElementById(`a-${rotationA[0]}`).classList.add('server');
+    if (servingTeam === 'B') document.getElementById(`b-${rotationB[0]}`).classList.add('server');
+}
+
+function updateUI() {
+    document.getElementById("scoreA").textContent = scoreA;
+    document.getElementById("scoreB").textContent = scoreB;
+    document.getElementById("setsDisplay").textContent = `${setsWonA} - ${setsWonB}`;
+    const isTension = (scoreA >= 24 || scoreB >= 24);
+    document.getElementById("bodyTag").classList.toggle("tension-active", isTension);
+    updateRotationUI();
+}
+
+function checkSet() {
+    if ((scoreA >= 25 || scoreB >= 25) && Math.abs(scoreA - scoreB) >= 2) {
+        const winner = scoreA > scoreB ? 'A' : 'B';
+        const winName = document.getElementById("name" + winner).textContent;
+        if (winner === 'A') setsWonA++; else setsWonB++;
+        updateUI();
+        logHistory(currentSet, scoreA, scoreB);
+        const winThreshold = Math.ceil(totalSets / 2);
+        if (setsWonA === winThreshold || setsWonB === winThreshold) {
+            endMatch(winName);
+        } else {
+            document.getElementById("winnerText").textContent = `${winName} WINS SET!`;
+            setTimeout(() => {
+                scoreA = 0; scoreB = 0; currentSet++;
+                document.getElementById("currentSetDisplay").textContent = currentSet;
+                document.getElementById("winnerText").textContent = "";
+                updateUI();
+            }, 3000);
+        }
+    }
+}
+
+function logHistory(set, a, b) {
+    document.getElementById("historyContainer").style.display = "block";
+    const row = `<tr><td>${set}</td><td class="${a>b?'winner-cell':''}">${a}</td><td class="${b>a?'winner-cell':''}">${b}</td></tr>`;
+    document.getElementById("historyBody").innerHTML += row;
+}
+
+function endMatch(name) {
+    isMatchOver = true; whistleSound.play(); clearInterval(timerInterval);
+    document.getElementById("winnerText").innerHTML = `🏆 MATCH OVER <br> ${name} WINS!`;
+    document.getElementById("bodyTag").classList.remove("tension-active");
+}
+
+function startTimeout() {
+    if (isMatchOver) return;
+    clickSound.play();
+    let count = 30;
+    document.getElementById("timeoutOverlay").style.display = "flex";
+    document.getElementById("timerDisplay").textContent = count;
+    timeoutInt = setInterval(() => {
+        count--;
+        document.getElementById("timerDisplay").textContent = count;
+        if (count <= 0) stopTimeout();
+    }, 1000);
+}
+
+function stopTimeout() { clearInterval(timeoutInt); document.getElementById("timeoutOverlay").style.display = "none"; }
+
+function undoPoint() {
+    if (isMatchOver) return;
+    if (lastPoint === 'A' && scoreA > 0) scoreA--;
+    else if (lastPoint === 'B' && scoreB > 0) scoreB--;
+    lastPoint = null; updateUI();
+}
+
+function changeSide() {
+    const container = document.getElementById("teamContainer");
+    container.style.flexDirection = container.style.flexDirection === "row-reverse" ? "row" : "row-reverse";
+}
+</script>
+</body>
+</html>
