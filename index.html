@@ -2,37 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Volley Ball Score Card - Pro Edition</title>
 
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VolleyPro">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#020617">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><circle cx='50' cy='50' r='35' fill='none' stroke='%2322c55e' stroke-width='4'/><path d='M30 50 Q50 30 70 50 M35 65 Q50 45 65 65 M50 15 L50 85' stroke='%2322c55e' stroke-width='3' fill='none'/><text x='50' y='92' font-family='Arial' font-size='12' font-weight='bold' fill='%2322c55e' text-anchor='middle'>PRO</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><circle cx='50' cy='50' r='35' fill='none' stroke='%2322c55e' stroke-width='4'/><path d='M30 50 Q50 30 70 50 M35 65 Q50 45 65 65 M50 15 L50 85' stroke='%2322c55e' stroke-width='3' fill='none'/><text x='50' y='92' font-family='Arial' font-size='12' font-weight='bold' fill='%2322c55e' text-anchor='middle'>PRO</text></svg>">
+
 <style>
-/* Background and Layout */
 .bg-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: filter 0.8s ease; }
 .overlay { position: fixed; inset: 0; background: linear-gradient(rgba(15,23,42,0.85), rgba(2,6,23,0.95)); z-index: -1; transition: background 0.8s ease; }
 
-/* 🌙 TENSION ATMOSPHERE */
 .tension-active .overlay {
     background: linear-gradient(rgba(153, 27, 27, 0.8), rgba(69, 10, 10, 0.9));
     animation: pulse-tension 2s infinite ease-in-out;
 }
 .tension-active .bg-video { filter: saturate(1.8) blur(2px); }
-.tension-active .footer-tag span { animation: glow-text 2s infinite; }
 
 @keyframes pulse-tension {
     0%, 100% { opacity: 0.9; }
     50% { opacity: 0.6; }
 }
 
-@keyframes glow-text {
-    0%, 100% { text-shadow: 0 0 5px #22c55e; color: #22c55e; }
-    50% { text-shadow: 0 0 20px #22c55e, 0 0 30px #22c55e; color: #fff; }
-}
-
-body { margin: 0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; overflow-x: hidden;}
+body { margin: 0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; overflow-x: hidden; overscroll-behavior-y: contain;}
 
 .app { width: 90%; max-width: 450px; background: rgba(2,6,23,0.85); backdrop-filter: blur(14px); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); position: relative;}
 
-/* Footer Branding */
 .footer-tag { position: fixed; bottom: 15px; right: 20px; font-size: 10px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; text-transform: uppercase; z-index: 100; pointer-events: none; }
 .footer-tag span { color: #22c55e; font-weight: bold; transition: all 0.5s ease; }
 
@@ -40,33 +40,44 @@ h1 { text-align: center; margin-bottom: 15px; font-weight: 300; letter-spacing: 
 .setup, .scoreboard { display: none; }
 .active { display: block; }
 
-/* Setup Cards */
 .format-selector { display: flex; gap: 10px; margin: 15px 0 25px 0; }
 .format-card { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s; }
 .format-card.selected { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3); }
 .format-card .sets-num { display: block; font-size: 24px; font-weight: 800; }
 .format-card .sets-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
 
-/* Rotation Grid */
 .rotation-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 10px auto; width: 120px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 8px; }
 .pos { width: 30px; height: 30px; background: #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.3s; }
 .pos.server { background: #fbbf24; color: #000; font-weight: bold; box-shadow: 0 0 10px #fbbf24; }
 
-/* Scoreboard Elements */
 .teams { display: flex; gap: 15px; margin-top: 20px; }
 .team { flex: 1; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; text-align: center; }
 .score { font-size: 72px; font-weight: 800; margin: 10px 0; line-height: 1; }
-.meta { margin-top: 20px; text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; }
 
-/* History */
+/* 📜 NEW: MATCH LOG STYLES */
+.match-log { 
+    margin-top: 15px; 
+    height: 100px; 
+    overflow-y: auto; 
+    background: rgba(0,0,0,0.4); 
+    border-radius: 12px; 
+    padding: 10px; 
+    font-size: 11px; 
+    color: #94a3b8;
+    border: 1px solid rgba(255,255,255,0.05);
+    scroll-behavior: smooth;
+}
+.log-entry { margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 3px; display: flex; justify-content: space-between;}
+.log-time { color: #22c55e; font-family: monospace; }
+
+.meta { margin-top: 15px; text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; }
 .history-container { margin-top: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 10px; display: none; }
 .history-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
 .winner-cell { color: #22c55e; font-weight: bold; }
 
-/* Inputs & Buttons */
 input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: none; font-size: 16px; box-sizing: border-box; font-family: inherit;}
 input { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
-button { font-weight: bold; cursor: pointer; transition: 0.2s; }
+button { font-weight: bold; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
 .primary { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
 .undo-btn { background: #475569; margin-top: 8px; font-size: 14px; color: #cbd5e1; }
 .danger { background: #ef4444; color: white; }
@@ -94,54 +105,46 @@ button { font-weight: bold; cursor: pointer; transition: 0.2s; }
   <div class="setup active" id="setup">
     <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Match Format</label>
     <div class="format-selector">
-        <div class="format-card" onclick="setFormat(1, this)">
-            <span class="sets-num">1</span>
-            <span class="sets-label">Single</span>
-        </div>
-        <div class="format-card selected" onclick="setFormat(3, this)">
-            <span class="sets-num">3</span>
-            <span class="sets-label">Best of 3</span>
-        </div>
-        <div class="format-card" onclick="setFormat(5, this)">
-            <span class="sets-num">5</span>
-            <span class="sets-label">Best of 5</span>
-        </div>
+        <div class="format-card" onclick="setFormat(1, this)"><span class="sets-num">1</span><span class="sets-label">Single</span></div>
+        <div class="format-card selected" onclick="setFormat(3, this)"><span class="sets-num">3</span><span class="sets-label">Best of 3</span></div>
+        <div class="format-card" onclick="setFormat(5, this)"><span class="sets-num">5</span><span class="sets-label">Best of 5</span></div>
     </div>
     <input type="hidden" id="matchFormatValue" value="3">
-    
-    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Team Names</label>
     <input type="text" id="teamAName" placeholder="Team A">
     <input type="text" id="teamBName" placeholder="Team B">
-    
     <button class="primary" style="margin-top: 25px;" onclick="startMatch()">START MATCH</button>
   </div>
 
   <div class="scoreboard" id="scoreboard">
     <div class="teams" id="teamContainer">
-      <div class="team" id="containerA">
+      <div class="team">
         <h2 id="nameA" style="font-size:14px; margin:0; opacity: 0.7;">A</h2>
         <div class="rotation-grid" id="rotA">
             <div class="pos" id="a-4">4</div><div class="pos" id="a-3">3</div><div class="pos" id="a-2">2</div>
             <div class="pos" id="a-5">5</div><div class="pos" id="a-6">6</div><div class="pos" id="a-1">1</div>
         </div>
         <div class="score" id="scoreA">0</div>
-        <button class="primary" id="btnA" onclick="addPoint('A')">+1</button>
+        <button class="primary" onclick="addPoint('A')">+1</button>
       </div>
 
-      <div class="team" id="containerB">
+      <div class="team">
         <h2 id="nameB" style="font-size:14px; margin:0; opacity: 0.7;">B</h2>
         <div class="rotation-grid" id="rotB">
             <div class="pos" id="b-2">2</div><div class="pos" id="b-3">3</div><div class="pos" id="b-4">4</div>
             <div class="pos" id="b-1">1</div><div class="pos" id="b-6">6</div><div class="pos" id="b-5">5</div>
         </div>
         <div class="score" id="scoreB">0</div>
-        <button class="primary" id="btnB" onclick="addPoint('B')">+1</button>
+        <button class="primary" onclick="addPoint('B')">+1</button>
       </div>
     </div>
 
     <div style="display: flex; gap: 10px;">
         <button class="undo-btn" onclick="undoPoint()">↩ Undo</button>
         <button class="undo-btn" onclick="startTimeout()">⏱ Timeout</button>
+    </div>
+
+    <div class="match-log" id="matchLog">
+        <div style="text-align:center; padding-top:20px; opacity:0.5">Match activity will appear here...</div>
     </div>
     
     <div class="meta">
@@ -153,9 +156,7 @@ button { font-weight: bold; cursor: pointer; transition: 0.2s; }
 
     <div class="history-container" id="historyContainer">
         <table class="history-table">
-            <thead>
-                <tr><th>SET</th><th id="hNameA">A</th><th id="hNameB">B</th></tr>
-            </thead>
+            <thead><tr><th>SET</th><th id="hNameA">A</th><th id="hNameB">B</th></tr></thead>
             <tbody id="historyBody"></tbody>
         </table>
     </div>
@@ -182,6 +183,14 @@ function setFormat(val, el) {
     el.classList.add('selected');
 }
 
+function addLog(msg) {
+    const log = document.getElementById("matchLog");
+    const time = document.getElementById("matchTimer").textContent || "00:00";
+    const entry = `<div class="log-entry"><span class="log-time">[${time}]</span> <span>${msg}</span></div>`;
+    // We insert at the top so newest is visible first
+    log.insertAdjacentHTML('afterbegin', entry);
+}
+
 function startMatch() {
     whistleSound.play();
     const nA = document.getElementById("teamAName").value || "Team A";
@@ -195,10 +204,12 @@ function startMatch() {
     
     document.getElementById("setup").style.display = "none";
     document.getElementById("scoreboard").style.display = "block";
+    document.getElementById("matchLog").innerHTML = ""; // Clear placeholder
     
     matchStartTime = Date.now();
     timerInterval = setInterval(updateMatchTimer, 1000);
     updateRotationUI();
+    addLog("Match Started");
 }
 
 function updateMatchTimer() {
@@ -213,6 +224,10 @@ function addPoint(team) {
     if (servingTeam && servingTeam !== team) rotate(team);
     lastPoint = team; servingTeam = team;
     team === 'A' ? scoreA++ : scoreB++;
+    
+    const teamName = document.getElementById("name" + team).textContent;
+    addLog(`${teamName} point! (${scoreA}-${scoreB})`);
+    
     updateUI();
     checkSet();
 }
@@ -233,8 +248,7 @@ function updateUI() {
     document.getElementById("scoreA").textContent = scoreA;
     document.getElementById("scoreB").textContent = scoreB;
     document.getElementById("setsDisplay").textContent = `${setsWonA} - ${setsWonB}`;
-    const isTension = (scoreA >= 24 || scoreB >= 24);
-    document.getElementById("bodyTag").classList.toggle("tension-active", isTension);
+    document.getElementById("bodyTag").classList.toggle("tension-active", (scoreA >= 24 || scoreB >= 24));
     updateRotationUI();
 }
 
@@ -243,8 +257,11 @@ function checkSet() {
         const winner = scoreA > scoreB ? 'A' : 'B';
         const winName = document.getElementById("name" + winner).textContent;
         if (winner === 'A') setsWonA++; else setsWonB++;
-        updateUI();
+        
+        addLog(`--- Set ${currentSet} won by ${winName} ---`);
         logHistory(currentSet, scoreA, scoreB);
+        updateUI();
+
         const winThreshold = Math.ceil(totalSets / 2);
         if (setsWonA === winThreshold || setsWonB === winThreshold) {
             endMatch(winName);
@@ -270,11 +287,13 @@ function endMatch(name) {
     isMatchOver = true; whistleSound.play(); clearInterval(timerInterval);
     document.getElementById("winnerText").innerHTML = `🏆 MATCH OVER <br> ${name} WINS!`;
     document.getElementById("bodyTag").classList.remove("tension-active");
+    addLog(`GAME OVER: ${name} WINS!`);
 }
 
 function startTimeout() {
     if (isMatchOver) return;
     clickSound.play();
+    addLog("Timeout called");
     let count = 30;
     document.getElementById("timeoutOverlay").style.display = "flex";
     document.getElementById("timerDisplay").textContent = count;
@@ -291,12 +310,14 @@ function undoPoint() {
     if (isMatchOver) return;
     if (lastPoint === 'A' && scoreA > 0) scoreA--;
     else if (lastPoint === 'B' && scoreB > 0) scoreB--;
+    if (lastPoint) addLog(`Undo: Last point removed`);
     lastPoint = null; updateUI();
 }
 
 function changeSide() {
     const container = document.getElementById("teamContainer");
     container.style.flexDirection = container.style.flexDirection === "row-reverse" ? "row" : "row-reverse";
+    addLog("Sides swapped");
 }
 </script>
 </body>
